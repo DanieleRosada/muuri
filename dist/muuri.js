@@ -237,18 +237,6 @@
     return this;
   };
 
-  // Set up the default export values.
-  // ['', 'Webkit', 'Moz', 'O', 'ms'].forEach(function(prefix) {
-  //   if (isTransformSupported) return;
-  //   var propName = prefix ? prefix + styleCap : style;
-  //   if (document.documentElement.style[propName] !== undefined) {
-  //     prefix = prefix.toLowerCase();
-  //     transformStyle = prefix ? '-' + prefix + '-' + style : style;
-  //     transformProp = propName;
-  //     isTransformSupported = false; //true
-  //   }
-  // });
-
   var stylesCache = typeof WeakMap === 'function' ? new WeakMap() : null;
 
   /**
@@ -879,7 +867,7 @@
     // translateData.x = parseFloat(matrixData[4]) || 0;
     // translateData.y = parseFloat(matrixData[5]) || 0;
 
-    // return translateData;
+      return translateData;
   }
 
   /**
@@ -2321,6 +2309,8 @@
    * https://github.com/niklasramo/mezr/blob/0.6.1/mezr.js#L607
    */
   function checkTransformLeak() {
+    // No transforms -> definitely leaks.
+
 
     // No body available -> can't check it.
     if (!document.body) return null;

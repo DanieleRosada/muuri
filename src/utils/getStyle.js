@@ -4,7 +4,6 @@
  * https://github.com/haltu/muuri/blob/master/LICENSE.md
  */
 
-import { transformStyle } from './supportedTransform.js';
 
 var stylesCache = typeof WeakMap === 'function' ? new WeakMap() : null;
 

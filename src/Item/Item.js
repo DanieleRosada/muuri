@@ -19,7 +19,6 @@ import getStyle from '../utils/getStyle.js';
 import getStyleAsFloat from '../utils/getStyleAsFloat.js';
 import getTranslateString from '../utils/getTranslateString.js';
 import removeClass from '../utils/removeClass.js';
-import { transformProp } from '../utils/supportedTransform.js';
 
 /**
  * Creates a new Item instance for a Grid instance.

@@ -38,7 +38,6 @@ import isTransformed from '../utils/isTransformed.js';
 import normalizeArrayIndex from '../utils/normalizeArrayIndex.js';
 import removeClass from '../utils/removeClass.js';
 import setStyles from '../utils/setStyles';
-import { isTransformSupported, transformProp } from '../utils/supportedTransform.js';
 
 // To provide consistently correct dragging experience we need to know if
 // transformed elements leak fixed elements or not.
@@ -1413,7 +1412,7 @@ function openAnchorHref(element) {
  */
 function checkTransformLeak() {
   // No transforms -> definitely leaks.
-  if (!isTransformSupported) return true;
+
 
   // No body available -> can't check it.
   if (!document.body) return null;
