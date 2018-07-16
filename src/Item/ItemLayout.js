@@ -100,8 +100,8 @@ ItemLayout.prototype.start = function(instant, onFinish) {
       : 0;
 
   // Get target styles.
-  this._targetStyles.style += getTranslateString(item._left + offsetLeft, item._top + offsetTop);
-
+  this._targetStyles.style.left = item._left + offsetLeft;
+  this._targetStyles.style.top = item._top + offsetTop;
   // If no animations are needed, easy peasy!
   if (!animEnabled) {
     isPositioning && ticker.cancel(item._id);
@@ -244,11 +244,8 @@ ItemLayout.prototype._startAnimation = function() {
   !this._isInterrupted && addClass(element, settings.itemPositioningClass);
 
   // Get current styles for animation.
-  this._currentStyles.style += getTranslateString(
-    this._currentLeft + this._offsetLeft,
-    this._currentTop + this._offsetTop
-  );
-
+  this._currentStyles.style.left = this._currentLeft + this._offsetLeft;
+  this._currentStyles.style.top =  this._currentTop + this._offsetTop;
   // Animate.
   item._animate.start(this._currentStyles, this._targetStyles, this._animateOptions);
 };

@@ -245,7 +245,7 @@
   //     prefix = prefix.toLowerCase();
   //     transformStyle = prefix ? '-' + prefix + '-' + style : style;
   //     transformProp = propName;
-  //     isTransformSupported = true;
+  //     isTransformSupported = false; //true
   //   }
   // });
 
@@ -879,7 +879,7 @@
     // translateData.x = parseFloat(matrixData[4]) || 0;
     // translateData.y = parseFloat(matrixData[5]) || 0;
 
-    return translateData;
+    // return translateData;
   }
 
   /**
@@ -890,7 +890,7 @@
    * @param {Number} y
    * @returns {String}
    */
-  function getTranslateString(x, y) {
+  function getTranslateString$1(x, y) {
     return 'left:' + x + 'px; top:' + y + 'px';
   }
 
@@ -1357,7 +1357,10 @@
     // sure the translate values are adjusted to account for the DOM shift.
     if (element.parentNode !== grid._element) {
       grid._element.appendChild(element);
-      element.style += getTranslateString(this._gridX, this._gridY);
+      //element.style[transformProp] = getTranslateString(this._gridX, this._gridY);
+      element.style.left=this._gridX;
+      element.style.top=this._gridY;
+
     }
 
     // Remove dragging class.
@@ -1785,7 +1788,7 @@
     if (targetContainer !== currentContainer) {
       targetContainer.appendChild(element);
       offsetDiff = getOffsetDiff(currentContainer, targetContainer, true);
-      translate += getTranslate(element);
+      translate = getTranslate(element);
       translate.x -= offsetDiff.left;
       translate.y -= offsetDiff.top;
     }
@@ -1807,7 +1810,9 @@
     // Adjust the position of the item element if it was moved from a container
     // to another.
     if (targetContainer !== currentContainer) {
-      element.style += getTranslateString(translate.x, translate.y);
+      //element.style[transformProp] = getTranslateString(translate.x, translate.y);
+      element.style.left=this._gridX;
+      element.style.top=this._gridY;
     }
 
     // Update child element's styles to reflect the current visibility state.
@@ -1867,14 +1872,16 @@
 
     // Stop current positioning animation.
     if (item.isPositioning()) {
-      item._layout.stop(true, getTranslateString(currentLeft, currentTop));
+      //item._layout.stop(true, { transform: getTranslateString(currentLeft, currentTop) });
+      item._layout.stop(true, {top: currentTop, left: currentLeft});
     }
 
     // Stop current migration animation.
     if (migrate._isActive) {
       currentLeft -= migrate._containerDiffX;
       currentTop -= migrate._containerDiffY;
-      migrate.stop(true, getTranslateString(currentLeft, currentTop));
+      //migrate.stop(true, { transform: getTranslateString(currentLeft, currentTop) });
+      migrate.stop(true, {top: currentTop ,left:currentLeft});
     }
 
     // If item is being released reset release data.
@@ -1914,7 +1921,9 @@
         this._left = currentLeft + this._containerDiffX;
         this._top = currentTop + this._containerDiffY;
         dragContainer.appendChild(element);
-        element.style += getTranslateString(this._left, this._top);
+        //element.style[transformProp] = getTranslateString(this._left, this._top);
+        element.style.top=this._top;
+        element.style.left=this._left;
       }
     }
 
@@ -1995,7 +2004,9 @@
     if (!item._isActive) return;
 
     // Update element's translateX/Y values.
-    item._element.style += getTranslateString(this._left, this._top);
+   //item._element.style[transformProp] = getTranslateString(this._left, this._top);
+    item._element.style.top=this._top;
+    item._element.style.left=this._left;
 
     // Emit dragMove event.
     this._getGrid()._emit(eventDragMove, item, this._lastEvent);
@@ -2084,7 +2095,9 @@
     if (!item._isActive) return;
 
     // Update element's translateX/Y values.
-    item._element.style += getTranslateString(this._left, this._top);
+    //item._element.style[transformProp] = getTranslateString(this._left, this._top);
+    item._element.style.top=this._top;
+    item._element.style.left=this._left;
 
     // Emit dragScroll event.
     this._getGrid()._emit(eventDragScroll, item, this._lastScrollEvent);
@@ -2319,12 +2332,13 @@
       elem.style.display = 'block';
       elem.style.visibility = 'hidden';
       elem.style.left = isInner ? '0px' : '1px';
+      //elem.style[transformProp] = 'none';
       return elem;
     });
     var outer = document.body.appendChild(elems[0]);
     var inner = outer.appendChild(elems[1]);
     var left = inner.getBoundingClientRect().left;
-
+    //outer.style[transformProp] = 'scale(1)';
     var ret = left === inner.getBoundingClientRect().left;
     document.body.removeChild(outer);
     return ret;
@@ -2501,8 +2515,8 @@
         : 0;
 
     // Get target styles.
-    this._targetStyles.style += getTranslateString(item._left + offsetLeft, item._top + offsetTop);
-
+    this._targetStyles.style.left = item._left + offsetLeft;
+    this._targetStyles.style.top = item._top + offsetTop;
     // If no animations are needed, easy peasy!
     if (!animEnabled) {
       isPositioning && ticker.cancel(item._id);
@@ -2645,11 +2659,8 @@
     !this._isInterrupted && addClass(element, settings.itemPositioningClass);
 
     // Get current styles for animation.
-    this._currentStyles.style += getTranslateString(
-      this._currentLeft + this._offsetLeft,
-      this._currentTop + this._offsetTop
-    );
-
+    this._currentStyles.style.left = this._currentLeft + this._offsetLeft;
+    this._currentStyles.style.top =  this._currentTop + this._offsetTop;
     // Animate.
     item._animate.start(this._currentStyles, this._targetStyles, this._animateOptions);
   };
@@ -2728,21 +2739,21 @@
 
     // Abort current positioning.
     if (item.isPositioning()) {
-      item._layout.stop(true, getTranslateString(translateX, translateY) );
+      item._layout.stop(true, { top: translateY, left: translateX });
     }
 
     // Abort current migration.
     if (this._isActive) {
       translateX -= this._containerDiffX;
       translateY -= this._containerDiffY;
-      this.stop(true, getTranslateString(translateX, translateY) );
+      this.stop(true, getTranslateString$1(translateX, translateY));
     }
 
     // Abort current release.
     if (item.isReleasing()) {
       translateX -= item._release._containerDiffX;
       translateY -= item._release._containerDiffY;
-      item._release.stop(true, getTranslateString(translateX, translateY));
+      item._release.stop(true, getTranslateString$1(translateX, translateY));
     }
 
     // Stop current visibility animations.
@@ -2805,10 +2816,8 @@
         translateX = translate.x;
         translateY = translate.y;
       }
-      element.style+= getTranslateString(
-        translateX + offsetDiff.left,
-        translateY + offsetDiff.top
-      );
+      element.style.left = translateX + offsetDiff.left;
+      element.style.top = translateY + offsetDiff.top;
     }
 
     // Update child element's styles to reflect the current visibility state.
@@ -2884,12 +2893,11 @@
       if (!currentStyles) {
         if (abort) {
           translate = getTranslate(element);
-          tempStyles.style += getTranslateString(
-            translate.x - this._containerDiffX,
-            translate.y - this._containerDiffY
-          );
+          tempStyles.style.top = translate.y - this._containerDiffY;
+          tempStyles.style.left = translate.x - this._containerDiffX;
         } else {
-          tempStyles.style += getTranslateString(item._left, item._top);
+          tempStyles.style.top = item._top;
+          tempStyles.style.left = item._left;
         }
         currentStyles = tempStyles;
       }
@@ -3005,12 +3013,11 @@
       if (!currentStyles) {
         if (abort) {
           translate = getTranslate(element);
-          tempStyles$1.style += getTranslateString(
-            translate.x - this._containerDiffX,
-            translate.y - this._containerDiffY
-          );
+          tempStyles$1.style.left = translate.x - this._containerDiffX;
+          tempStyles$1.style.top =translate.y - this._containerDiffY;
         } else {
-          tempStyles$1.style += getTranslateString(item._left, item._top);
+          tempStyles$1.style.left =item._left;
+          tempStyles$1.style.top =item._top;
         }
         currentStyles = tempStyles$1;
       }
@@ -3342,7 +3349,7 @@
     if (!this._isHidden) return;
     var item = this._item;
     this._isHiding = false;
-    finishStyles.style += getTranslateString(0, 0);
+    finishStyles.transform = getTranslateString(0, 0);
     item._layout.stop(true, finishStyles);
     item._element.style.display = 'none';
     this._queue.flush(false, item);
@@ -3407,7 +3414,6 @@
     // Set element's initial position styles.
     element.style.left = '0';
     element.style.top = '0';
-    element.style = getTranslateString(0, 0);
 
     // Initiate item's animation controllers.
     this._animate = new ItemAnimate(this, element);
@@ -4388,9 +4394,11 @@
     // Item's visible/hidden state styles
     visibleStyles: {
       opacity: '1',
+
     },
     hiddenStyles: {
       opacity: '0',
+    
     },
 
     // Layout

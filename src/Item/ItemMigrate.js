@@ -17,7 +17,6 @@ import normalizeArrayIndex from '../utils/normalizeArrayIndex.js';
 import removeClass from '../utils/removeClass.js';
 import setStyles from '../utils/setStyles.js';
 
-
 var tempStyles = {};
 
 /**
@@ -92,14 +91,14 @@ ItemMigrate.prototype.start = function(targetGrid, position, container) {
 
   // Abort current positioning.
   if (item.isPositioning()) {
-    item._layout.stop(true, getTranslateString(translateX, translateY) );
+    item._layout.stop(true, { top: translateY, left: translateX });
   }
 
   // Abort current migration.
   if (this._isActive) {
     translateX -= this._containerDiffX;
     translateY -= this._containerDiffY;
-    this.stop(true, getTranslateString(translateX, translateY) );
+    this.stop(true, getTranslateString(translateX, translateY));
   }
 
   // Abort current release.
@@ -169,10 +168,8 @@ ItemMigrate.prototype.start = function(targetGrid, position, container) {
       translateX = translate.x;
       translateY = translate.y;
     }
-    element.style+= getTranslateString(
-      translateX + offsetDiff.left,
-      translateY + offsetDiff.top
-    );
+    element.style.left = translateX + offsetDiff.left;
+    element.style.top = translateY + offsetDiff.top;
   }
 
   // Update child element's styles to reflect the current visibility state.
@@ -248,12 +245,11 @@ ItemMigrate.prototype.stop = function(abort, currentStyles) {
     if (!currentStyles) {
       if (abort) {
         translate = getTranslate(element);
-        tempStyles.style += getTranslateString(
-          translate.x - this._containerDiffX,
-          translate.y - this._containerDiffY
-        );
+        tempStyles.style.top = translate.y - this._containerDiffY;
+        tempStyles.style.left = translate.x - this._containerDiffX;
       } else {
-        tempStyles.style += getTranslateString(item._left, item._top);
+        tempStyles.style.top = item._top;
+        tempStyles.style.left = item._left;
       }
       currentStyles = tempStyles;
     }

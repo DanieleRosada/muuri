@@ -10,7 +10,6 @@ import Queue from '../Queue/Queue.js';
 
 import addClass from '../utils/addClass.js';
 import getCurrentStyles from '../utils/getCurrentStyles.js';
-import getTranslateString from '../utils/getTranslateString.js';
 import removeClass from '../utils/removeClass.js';
 import setStyles from '../utils/setStyles.js';
 
@@ -296,7 +295,7 @@ ItemVisibility.prototype._finishHide = function() {
   if (!this._isHidden) return;
   var item = this._item;
   this._isHiding = false;
-  finishStyles.style += getTranslateString(0, 0);
+  finishStyles.transform = getTranslateString(0, 0);
   item._layout.stop(true, finishStyles);
   item._element.style.display = 'none';
   this._queue.flush(false, item);

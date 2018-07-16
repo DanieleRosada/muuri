@@ -27,5 +27,5 @@ export default function getTranslate(element) {
   // translateData.x = parseFloat(matrixData[4]) || 0;
   // translateData.y = parseFloat(matrixData[5]) || 0;
 
-  return translateData;
+  // return translateData;
 }

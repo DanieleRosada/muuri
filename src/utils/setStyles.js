@@ -4,7 +4,6 @@
  * https://github.com/haltu/muuri/blob/master/LICENSE.md
  */
 
-import { transformProp } from './supportedTransform.js';
 
 /**
  * Set inline styles to an element.
