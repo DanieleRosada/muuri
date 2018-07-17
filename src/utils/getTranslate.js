@@ -17,15 +17,8 @@ var translateData = {};
  * @returns {Object}
  */
 export default function getTranslate(element) {
-  translateData.x = element.style.left;
-  translateData.y = element.style.top;
-
-  // var transform = getStyle(element, 'transform');
-  // if (!transform) return translateData;
-
-  // var matrixData = transform.replace('matrix(', '').split(',');
-  // translateData.x = parseFloat(matrixData[4]) || 0;
-  // translateData.y = parseFloat(matrixData[5]) || 0;
+  translateData.x = element.offsetLeft;
+  translateData.y = element.offsetTop;
 
   return translateData;
 }
