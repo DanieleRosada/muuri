@@ -97,11 +97,16 @@ ItemRelease.prototype.stop = function(abort, currentStyles) {
     if (!currentStyles) {
       if (abort) {
         translate = getTranslate(element);
-        tempStyles.style.left = translate.x - this._containerDiffX;
-        tempStyles.style.top =translate.y - this._containerDiffY;
+        // tempStyles.transform = getTranslateString(
+        //   translate.x - this._containerDiffX,
+        //   translate.y - this._containerDiffY
+        // );
+        tempStyles.left=translate.x - this._containerDiffX+'px';
+        tempStyles.top=translate.y - this._containerDiffY+'px';
       } else {
-        tempStyles.style.left =item._left;
-        tempStyles.style.top =item._top;
+        //tempStyles.transform = getTranslateString(item._left, item._top);
+        tempStyles.left=item._left+'px';
+        tempStyles.top=item._top+'px';
       }
       currentStyles = tempStyles;
     }

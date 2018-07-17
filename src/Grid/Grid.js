@@ -245,11 +245,9 @@ Grid.defaultOptions = {
   // Item's visible/hidden state styles
   visibleStyles: {
     opacity: '1',
-
   },
   hiddenStyles: {
     opacity: '0',
-  
   },
 
   // Layout

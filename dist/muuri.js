@@ -237,6 +237,18 @@
     return this;
   };
 
+  // Set up the default export values.
+  // ['', 'Webkit', 'Moz', 'O', 'ms'].forEach(function(prefix) {
+  //   if (isTransformSupported) return;
+  //   var propName = prefix ? prefix + styleCap : style;
+  //   if (document.documentElement.style[propName] !== undefined) {
+  //     prefix = prefix.toLowerCase();
+  //     transformStyle = prefix ? '-' + prefix + '-' + style : style;
+  //     transformProp = propName;
+  //     isTransformSupported = true;
+  //   }
+  // });
+
   var stylesCache = typeof WeakMap === 'function' ? new WeakMap() : null;
 
   /**
@@ -252,7 +264,7 @@
       styles = window.getComputedStyle(element, null);
       stylesCache && stylesCache.set(element, styles);
     }
-    return styles.getPropertyValue(style);
+    return styles.getPropertyValue(style); //=== 'transform' ? transformStyle : style
   }
 
   /**
@@ -288,7 +300,8 @@
    */
   function setStyles(element, styles) {
     for (var prop in styles) {
-      element.style= styles[prop];
+      // element.style[prop === 'transform' ? transformProp : prop] = styles[prop];
+      element.style[prop] = styles[prop];
     }
   }
 
@@ -857,8 +870,8 @@
    * @returns {Object}
    */
   function getTranslate(element) {
-    translateData.x = element.offsetLeft;
-    translateData.y = element.offsetTop;
+    translateData.x = 0;
+    translateData.y = 0;
 
     // var transform = getStyle(element, 'transform');
     // if (!transform) return translateData;
@@ -867,7 +880,7 @@
     // translateData.x = parseFloat(matrixData[4]) || 0;
     // translateData.y = parseFloat(matrixData[5]) || 0;
 
-      return translateData;
+    return translateData;
   }
 
   /**
@@ -878,8 +891,8 @@
    * @param {Number} y
    * @returns {String}
    */
-  function getTranslateString$1(x, y) {
-    return 'left:' + x + 'px; top:' + y + 'px';
+  function getTranslateString(x, y) {
+    return 'left:' + x + 'px; top:' + y + 'px;';
   }
 
   var tempArray = [];
@@ -1346,9 +1359,8 @@
     if (element.parentNode !== grid._element) {
       grid._element.appendChild(element);
       //element.style[transformProp] = getTranslateString(this._gridX, this._gridY);
-      element.style.left=this._gridX;
-      element.style.top=this._gridY;
-
+      element.style.left = this._gridX+'px';
+      element.style.top = this._gridY+'px';
     }
 
     // Remove dragging class.
@@ -1799,8 +1811,8 @@
     // to another.
     if (targetContainer !== currentContainer) {
       //element.style[transformProp] = getTranslateString(translate.x, translate.y);
-      element.style.left=this._gridX;
-      element.style.top=this._gridY;
+      element.style.left = translate.x+'px';
+      element.style.top = translate.y+'px';
     }
 
     // Update child element's styles to reflect the current visibility state.
@@ -1861,7 +1873,7 @@
     // Stop current positioning animation.
     if (item.isPositioning()) {
       //item._layout.stop(true, { transform: getTranslateString(currentLeft, currentTop) });
-      item._layout.stop(true, {top: currentTop, left: currentLeft});
+      item._layout.stop(true, getTranslateString(currentLeft, currentTop)); //{}
     }
 
     // Stop current migration animation.
@@ -1869,7 +1881,7 @@
       currentLeft -= migrate._containerDiffX;
       currentTop -= migrate._containerDiffY;
       //migrate.stop(true, { transform: getTranslateString(currentLeft, currentTop) });
-      migrate.stop(true, {top: currentTop ,left:currentLeft});
+      migrate.stop(true, getTranslateString(currentLeft, currentTop)); //{}
     }
 
     // If item is being released reset release data.
@@ -1910,8 +1922,8 @@
         this._top = currentTop + this._containerDiffY;
         dragContainer.appendChild(element);
         //element.style[transformProp] = getTranslateString(this._left, this._top);
-        element.style.top=this._top;
-        element.style.left=this._left;
+        element.style.left = this._left+'px';
+        element.style.top = this._top+'px';
       }
     }
 
@@ -1992,9 +2004,9 @@
     if (!item._isActive) return;
 
     // Update element's translateX/Y values.
-   //item._element.style[transformProp] = getTranslateString(this._left, this._top);
-    item._element.style.top=this._top;
-    item._element.style.left=this._left;
+    //item._element.style[transformProp] = getTranslateString(this._left, this._top);
+    item._element.style.left = this._left+'px';
+    itrm._element.style.top = this._top+'px';
 
     // Emit dragMove event.
     this._getGrid()._emit(eventDragMove, item, this._lastEvent);
@@ -2084,8 +2096,8 @@
 
     // Update element's translateX/Y values.
     //item._element.style[transformProp] = getTranslateString(this._left, this._top);
-    item._element.style.top=this._top;
-    item._element.style.left=this._left;
+    item._element.style.left = this._left+'px';
+    itrm._element.style.top = this._top+'px';
 
     // Emit dragScroll event.
     this._getGrid()._emit(eventDragScroll, item, this._lastScrollEvent);
@@ -2310,7 +2322,7 @@
    */
   function checkTransformLeak() {
     // No transforms -> definitely leaks.
-
+    return true;
 
     // No body available -> can't check it.
     if (!document.body) return null;
@@ -2322,7 +2334,7 @@
       elem.style.display = 'block';
       elem.style.visibility = 'hidden';
       elem.style.left = isInner ? '0px' : '1px';
-      //elem.style[transformProp] = 'none';
+      // elem.style[transformProp] = 'none';
       return elem;
     });
     var outer = document.body.appendChild(elems[0]);
@@ -2461,7 +2473,7 @@
    * @param {Function} [onFinish]
    * @returns {ItemLayout}
    */
-  ItemLayout.prototype.start = function(instant, onFinish) {
+  ItemLayout.prototype.start = function (instant, onFinish) {
     if (this._isDestroyed) return;
 
     var item = this._item;
@@ -2505,8 +2517,10 @@
         : 0;
 
     // Get target styles.
-    this._targetStyles.style.left = item._left + offsetLeft;
-    this._targetStyles.style.top = item._top + offsetTop;
+    //this._targetStyles.transform = getTranslateString(item._left + offsetLeft, item._top + offsetTop);
+    this._targetStyles.left = item._left + offsetLeft + 'px';
+    this._targetStyles.top = item._top + offsetTop + 'px';
+
     // If no animations are needed, easy peasy!
     if (!animEnabled) {
       isPositioning && ticker.cancel(item._id);
@@ -2541,7 +2555,7 @@
    * @param {Object} [targetStyles]
    * @returns {ItemLayout}
    */
-  ItemLayout.prototype.stop = function(processCallbackQueue, targetStyles) {
+  ItemLayout.prototype.stop = function (processCallbackQueue, targetStyles) {
     if (this._isDestroyed || !this._isActive) return this;
 
     var item = this._item;
@@ -2571,7 +2585,7 @@
    * @memberof ItemLayout.prototype
    * @returns {ItemLayout}
    */
-  ItemLayout.prototype.destroy = function() {
+  ItemLayout.prototype.destroy = function () {
     if (this._isDestroyed) return this;
     this.stop(true, {});
     this._queue.destroy();
@@ -2591,7 +2605,7 @@
    * @private
    * @memberof ItemLayout.prototype
    */
-  ItemLayout.prototype._finish = function() {
+  ItemLayout.prototype._finish = function () {
     if (this._isDestroyed) return;
 
     var item = this._item;
@@ -2618,7 +2632,7 @@
    * @private
    * @memberof ItemLayout.prototype
    */
-  ItemLayout.prototype._setupAnimation = function() {
+  ItemLayout.prototype._setupAnimation = function () {
     var element = this._item._element;
     var translate = getTranslate(element);
     this._currentLeft = translate.x - this._offsetLeft;
@@ -2631,7 +2645,7 @@
    * @private
    * @memberof ItemLayout.prototype
    */
-  ItemLayout.prototype._startAnimation = function() {
+  ItemLayout.prototype._startAnimation = function () {
     var item = this._item;
     var element = item._element;
     var grid = item.getGrid();
@@ -2649,11 +2663,18 @@
     !this._isInterrupted && addClass(element, settings.itemPositioningClass);
 
     // Get current styles for animation.
-    this._currentStyles.style.left = this._currentLeft + this._offsetLeft;
-    this._currentStyles.style.top =  this._currentTop + this._offsetTop;
+    // this._currentStyles.transform = getTranslateString(
+    //   this._currentLeft + this._offsetLeft,
+    //   this._currentTop + this._offsetTop
+    // );
+    this._currentStyles.left = this._currentLeft + this._offsetLeft + 'px';
+    this._currentStyles.top = this._currentTop + this._offsetTop + 'px';
+
     // Animate.
     item._animate.start(this._currentStyles, this._targetStyles, this._animateOptions);
   };
+
+  //import { transformProp } from '../utils/supportedTransform.js';
 
   var tempStyles = {};
 
@@ -2729,21 +2750,24 @@
 
     // Abort current positioning.
     if (item.isPositioning()) {
-      item._layout.stop(true, { top: translateY, left: translateX });
+      //item._layout.stop(true, { transform: getTranslateString(translateX, translateY) });
+      item._layout.stop(true, getTranslateString(translateX, translateY));
     }
 
     // Abort current migration.
     if (this._isActive) {
       translateX -= this._containerDiffX;
       translateY -= this._containerDiffY;
-      this.stop(true, getTranslateString$1(translateX, translateY));
+     // this.stop(true, { transform: getTranslateString(translateX, translateY) });
+      this.stop(true, getTranslateString(translateX, translateY));
     }
 
     // Abort current release.
     if (item.isReleasing()) {
       translateX -= item._release._containerDiffX;
       translateY -= item._release._containerDiffY;
-      item._release.stop(true, getTranslateString$1(translateX, translateY));
+      //item._release.stop(true, { transform: getTranslateString(translateX, translateY) });
+      item._release.stop(true, getTranslateString(translateX, translateY) );
     }
 
     // Stop current visibility animations.
@@ -2806,8 +2830,12 @@
         translateX = translate.x;
         translateY = translate.y;
       }
-      element.style.left = translateX + offsetDiff.left;
-      element.style.top = translateY + offsetDiff.top;
+      // element.style[transformProp] = getTranslateString(
+      //   translateX + offsetDiff.left,
+      //   translateY + offsetDiff.top
+      // );
+      element.style.left=translateX + offsetDiff.left+'px';
+      element.style.top= translateY + offsetDiff.top+'px';
     }
 
     // Update child element's styles to reflect the current visibility state.
@@ -2883,11 +2911,16 @@
       if (!currentStyles) {
         if (abort) {
           translate = getTranslate(element);
-          tempStyles.style.top = translate.y - this._containerDiffY;
-          tempStyles.style.left = translate.x - this._containerDiffX;
+          // tempStyles.transform = getTranslateString(
+          //   translate.x - this._containerDiffX,
+          //   translate.y - this._containerDiffY
+          // );
+          tempStyles.left=  translate.x - this._containerDiffX+'px';
+          tempStyles.top= translate.y - this._containerDiffY+'px';
         } else {
-          tempStyles.style.top = item._top;
-          tempStyles.style.left = item._left;
+          //tempStyles.transform = getTranslateString(item._left, item._top);
+          tempStyles.left=  item._left+'px';
+          tempStyles.top= item._top+'px';
         }
         currentStyles = tempStyles;
       }
@@ -3003,11 +3036,16 @@
       if (!currentStyles) {
         if (abort) {
           translate = getTranslate(element);
-          tempStyles$1.style.left = translate.x - this._containerDiffX;
-          tempStyles$1.style.top =translate.y - this._containerDiffY;
+          // tempStyles.transform = getTranslateString(
+          //   translate.x - this._containerDiffX,
+          //   translate.y - this._containerDiffY
+          // );
+          tempStyles$1.left=translate.x - this._containerDiffX+'px';
+          tempStyles$1.top=translate.y - this._containerDiffY+'px';
         } else {
-          tempStyles$1.style.left =item._left;
-          tempStyles$1.style.top =item._top;
+          //tempStyles.transform = getTranslateString(item._left, item._top);
+          tempStyles$1.left=item._left+'px';
+          tempStyles$1.top=item._top+'px';
         }
         currentStyles = tempStyles$1;
       }
@@ -3339,7 +3377,9 @@
     if (!this._isHidden) return;
     var item = this._item;
     this._isHiding = false;
-    finishStyles.transform = getTranslateString(0, 0);
+    //finishStyles.transform = getTranslateString(0, 0);
+    finishStyles.left='0px';
+    finishStyles.top='0px';
     item._layout.stop(true, finishStyles);
     item._element.style.display = 'none';
     this._queue.flush(false, item);
@@ -3354,6 +3394,8 @@
   function createUid() {
     return ++id;
   }
+
+  //import { transformProp } from '../utils/supportedTransform.js';
 
   /**
    * Creates a new Item instance for a Grid instance.
@@ -3402,8 +3444,9 @@
     this._isActive = isActive;
 
     // Set element's initial position styles.
-    element.style.left = '0';
-    element.style.top = '0';
+    element.style.left = '0px';
+    element.style.top = '0px';
+    //element.style[transformProp] = getTranslateString(0, 0);
 
     // Initiate item's animation controllers.
     this._animate = new ItemAnimate(this, element);
@@ -4384,11 +4427,9 @@
     // Item's visible/hidden state styles
     visibleStyles: {
       opacity: '1',
-
     },
     hiddenStyles: {
       opacity: '0',
-    
     },
 
     // Layout

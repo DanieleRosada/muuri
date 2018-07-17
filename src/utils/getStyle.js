@@ -4,6 +4,7 @@
  * https://github.com/haltu/muuri/blob/master/LICENSE.md
  */
 
+import { transformStyle } from './supportedTransform.js';
 
 var stylesCache = typeof WeakMap === 'function' ? new WeakMap() : null;
 
@@ -20,5 +21,5 @@ export default function getStyle(element, style) {
     styles = window.getComputedStyle(element, null);
     stylesCache && stylesCache.set(element, styles);
   }
-  return styles.getPropertyValue(style);
+  return styles.getPropertyValue(style); //=== 'transform' ? transformStyle : style
 }

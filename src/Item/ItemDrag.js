@@ -38,6 +38,7 @@ import isTransformed from '../utils/isTransformed.js';
 import normalizeArrayIndex from '../utils/normalizeArrayIndex.js';
 import removeClass from '../utils/removeClass.js';
 import setStyles from '../utils/setStyles';
+import { isTransformSupported, transformProp } from '../utils/supportedTransform.js';
 
 // To provide consistently correct dragging experience we need to know if
 // transformed elements leak fixed elements or not.
@@ -448,9 +449,8 @@ ItemDrag.prototype.stop = function() {
   if (element.parentNode !== grid._element) {
     grid._element.appendChild(element);
     //element.style[transformProp] = getTranslateString(this._gridX, this._gridY);
-    element.style.left=this._gridX;
-    element.style.top=this._gridY;
-
+    element.style.left = this._gridX+'px';
+    element.style.top = this._gridY+'px';
   }
 
   // Remove dragging class.
@@ -901,8 +901,8 @@ ItemDrag.prototype._finishMigration = function() {
   // to another.
   if (targetContainer !== currentContainer) {
     //element.style[transformProp] = getTranslateString(translate.x, translate.y);
-    element.style.left=this._gridX;
-    element.style.top=this._gridY;
+    element.style.left = translate.x+'px';
+    element.style.top = translate.y+'px';
   }
 
   // Update child element's styles to reflect the current visibility state.
@@ -963,7 +963,7 @@ ItemDrag.prototype._onStart = function(event) {
   // Stop current positioning animation.
   if (item.isPositioning()) {
     //item._layout.stop(true, { transform: getTranslateString(currentLeft, currentTop) });
-    item._layout.stop(true, {top: currentTop, left: currentLeft});
+    item._layout.stop(true, getTranslateString(currentLeft, currentTop)); //{}
   }
 
   // Stop current migration animation.
@@ -971,7 +971,7 @@ ItemDrag.prototype._onStart = function(event) {
     currentLeft -= migrate._containerDiffX;
     currentTop -= migrate._containerDiffY;
     //migrate.stop(true, { transform: getTranslateString(currentLeft, currentTop) });
-    migrate.stop(true, {top: currentTop ,left:currentLeft});
+    migrate.stop(true, getTranslateString(currentLeft, currentTop)); //{}
   }
 
   // If item is being released reset release data.
@@ -1012,8 +1012,8 @@ ItemDrag.prototype._onStart = function(event) {
       this._top = currentTop + this._containerDiffY;
       dragContainer.appendChild(element);
       //element.style[transformProp] = getTranslateString(this._left, this._top);
-      element.style.top=this._top;
-      element.style.left=this._left;
+      element.style.left = this._left+'px';
+      element.style.top = this._top+'px';
     }
   }
 
@@ -1094,9 +1094,9 @@ ItemDrag.prototype._applyMove = function() {
   if (!item._isActive) return;
 
   // Update element's translateX/Y values.
- //item._element.style[transformProp] = getTranslateString(this._left, this._top);
-  item._element.style.top=this._top;
-  item._element.style.left=this._left;
+  //item._element.style[transformProp] = getTranslateString(this._left, this._top);
+  item._element.style.left = this._left+'px';
+  itrm._element.style.top = this._top+'px';
 
   // Emit dragMove event.
   this._getGrid()._emit(eventDragMove, item, this._lastEvent);
@@ -1186,8 +1186,8 @@ ItemDrag.prototype._applyScroll = function() {
 
   // Update element's translateX/Y values.
   //item._element.style[transformProp] = getTranslateString(this._left, this._top);
-  item._element.style.top=this._top;
-  item._element.style.left=this._left;
+  item._element.style.left = this._left+'px';
+  itrm._element.style.top = this._top+'px';
 
   // Emit dragScroll event.
   this._getGrid()._emit(eventDragScroll, item, this._lastScrollEvent);
@@ -1412,7 +1412,7 @@ function openAnchorHref(element) {
  */
 function checkTransformLeak() {
   // No transforms -> definitely leaks.
-
+  if (!isTransformSupported) return true;
 
   // No body available -> can't check it.
   if (!document.body) return null;
@@ -1424,7 +1424,7 @@ function checkTransformLeak() {
     elem.style.display = 'block';
     elem.style.visibility = 'hidden';
     elem.style.left = isInner ? '0px' : '1px';
-    //elem.style[transformProp] = 'none';
+    // elem.style[transformProp] = 'none';
     return elem;
   });
   var outer = document.body.appendChild(elems[0]);
