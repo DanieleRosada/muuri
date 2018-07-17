@@ -5,7 +5,7 @@
  */
 
 // Set up the default export values.
-export var isTransformSupported = false;
+export var isTransformSupported = true;
 export var transformStyle = 'transform';
 export var transformProp = 'transform';
 

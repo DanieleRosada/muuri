@@ -258,13 +258,13 @@
    * @param {String} style
    * @returns {String}
    */
-  function getStyle(element) {
+  function getStyle(element, style) {
     var styles = stylesCache && stylesCache.get(element);
     if (!styles) {
       styles = window.getComputedStyle(element, null);
       stylesCache && stylesCache.set(element, styles);
     }
-    return styles.getPropertyValue(); //=== 'transform' ? transformStyle : style
+    return styles.getPropertyValue(style); //=== 'transform' ? transformStyle : style
   }
 
   /**
@@ -2314,8 +2314,6 @@
    * https://github.com/niklasramo/mezr/blob/0.6.1/mezr.js#L607
    */
   function checkTransformLeak() {
-    // No transforms -> definitely leaks.
-    return true;
 
     // No body available -> can't check it.
     if (!document.body) return null;
