@@ -870,8 +870,8 @@
    * @returns {Object}
    */
   function getTranslate(element) {
-    translateData.x = 0;
-    translateData.y = 0;
+    translateData.x = element.style.left;
+    translateData.y = element.style.top;
 
     // var transform = getStyle(element, 'transform');
     // if (!transform) return translateData;
