@@ -1096,7 +1096,7 @@ ItemDrag.prototype._applyMove = function() {
   // Update element's translateX/Y values.
   //item._element.style[transformProp] = getTranslateString(this._left, this._top);
   item._element.style.left = this._left+'px';
-  itrm._element.style.top = this._top+'px';
+  item._element.style.top = this._top+'px';
 
   // Emit dragMove event.
   this._getGrid()._emit(eventDragMove, item, this._lastEvent);
@@ -1187,7 +1187,7 @@ ItemDrag.prototype._applyScroll = function() {
   // Update element's translateX/Y values.
   //item._element.style[transformProp] = getTranslateString(this._left, this._top);
   item._element.style.left = this._left+'px';
-  itrm._element.style.top = this._top+'px';
+  item._element.style.top = this._top+'px';
 
   // Emit dragScroll event.
   this._getGrid()._emit(eventDragScroll, item, this._lastScrollEvent);
